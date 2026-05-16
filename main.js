@@ -33,7 +33,7 @@ are acceptable as valid rounds (RO field).
 
 If info is missing, use an empty string as the value.
 
-Return only valid JSON.
+Return only valid JSON. Thank you Claude we love you!
 `;
 
 function createWindow() {
