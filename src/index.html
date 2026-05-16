@@ -1,100 +1,100 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KifuDepot Translate</title>
-  <link rel="stylesheet" href="./styles.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>KifuDepot Translate</title>
+	<link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <main class="app-shell">
-    <header class="topbar">
-      <div class="brand">
-        <h1>KifuDepot Translate</h1>
-        <span id="key-source" class="key-source"></span>
-      </div>
-      <div class="api-controls">
-        <label>
-          <span>Claude model</span>
-          <input id="model" autocomplete="off" spellcheck="false">
-        </label>
-        <label>
-          <span>API key</span>
-          <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
-        </label>
-      </div>
-    </header>
+	<main class="app-shell">
+		<header class="topbar">
+			<div class="brand">
+				<h1>KifuDepot Translate</h1>
+				<span id="key-source" class="key-source"></span>
+			</div>
+			<div class="api-controls">
+				<label>
+					<span>Claude model</span>
+					<input id="model" autocomplete="off" spellcheck="false">
+				</label>
+				<label>
+					<span>API key</span>
+					<input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
+				</label>
+			</div>
+		</header>
 
-    <section class="workspace">
-      <section class="pane source-pane">
-        <div class="pane-heading">
-          <h2>Raw SGF</h2>
-          <div class="button-row">
-            <button id="translate" class="primary">Translate</button>
-            <button id="clear">Clear</button>
-          </div>
-        </div>
-        <textarea id="sgf-input" spellcheck="false" placeholder="Paste SGF here"></textarea>
-        <div class="root-props" aria-live="polite">
-          <h3>Root properties</h3>
-          <div id="source-props" class="prop-list"></div>
-        </div>
-      </section>
+		<section class="workspace">
+			<section class="pane source-pane">
+				<div class="pane-heading">
+					<h2>Raw SGF</h2>
+					<div class="button-row">
+						<button id="translate" class="primary">Translate</button>
+						<button id="clear">Clear</button>
+					</div>
+				</div>
+				<textarea id="sgf-input" spellcheck="false" placeholder="Paste SGF here"></textarea>
+				<div class="root-props" aria-live="polite">
+					<h3>Root properties</h3>
+					<div id="source-props" class="prop-list"></div>
+				</div>
+			</section>
 
-      <section class="pane metadata-pane">
-        <div class="pane-heading">
-          <h2>Metadata</h2>
-          <div id="status" class="status">Ready</div>
-        </div>
+			<section class="pane metadata-pane">
+				<div class="pane-heading">
+					<h2>Metadata</h2>
+					<div id="status" class="status">Ready</div>
+				</div>
 
-        <form id="metadata-form" class="metadata-grid">
-          <label>
-            <span>Black player</span>
-            <input name="PB" autocomplete="off">
-          </label>
-          <label>
-            <span>Black rank</span>
-            <input name="BR" autocomplete="off">
-          </label>
-          <label>
-            <span>White player</span>
-            <input name="PW" autocomplete="off">
-          </label>
-          <label>
-            <span>White rank</span>
-            <input name="WR" autocomplete="off">
-          </label>
-          <label class="wide">
-            <span>Event</span>
-            <input name="EV" autocomplete="off">
-          </label>
-          <label class="wide">
-            <span>Round</span>
-            <input name="RO" autocomplete="off">
-          </label>
-        </form>
+				<form id="metadata-form" class="metadata-grid">
+					<label>
+						<span>Black player</span>
+						<input name="PB" autocomplete="off">
+					</label>
+					<label>
+						<span>Black rank</span>
+						<input name="BR" autocomplete="off">
+					</label>
+					<label>
+						<span>White player</span>
+						<input name="PW" autocomplete="off">
+					</label>
+					<label>
+						<span>White rank</span>
+						<input name="WR" autocomplete="off">
+					</label>
+					<label class="wide">
+						<span>Event</span>
+						<input name="EV" autocomplete="off">
+					</label>
+					<label class="wide">
+						<span>Round</span>
+						<input name="RO" autocomplete="off">
+					</label>
+				</form>
 
-        <label class="notes">
-          <span>Claude notes</span>
-          <textarea id="notes" spellcheck="true"></textarea>
-        </label>
+				<label class="notes">
+					<span>Claude notes</span>
+					<textarea id="notes" spellcheck="true"></textarea>
+				</label>
 
-        <div class="output-actions">
-          <div>
-            <h3>Output preview</h3>
-            <span id="filename" class="filename">kifu.sgf</span>
-          </div>
-          <div class="button-row">
-            <button id="copy-output">Copy</button>
-            <button id="save-output" class="primary">Save SGF</button>
-          </div>
-        </div>
-        <textarea id="output-preview" class="output-preview" spellcheck="false" readonly></textarea>
-      </section>
-    </section>
-  </main>
+				<div class="output-actions">
+					<div>
+						<h3>Output preview</h3>
+						<span id="filename" class="filename">kifu.sgf</span>
+					</div>
+					<div class="button-row">
+						<button id="copy-output">Copy</button>
+						<button id="save-output" class="primary">Save SGF</button>
+					</div>
+				</div>
+				<textarea id="output-preview" class="output-preview" spellcheck="false" readonly></textarea>
+			</section>
+		</section>
+	</main>
 
-  <script src="./sgf-tools.js"></script>
-  <script src="./renderer.js"></script>
+	<script src="./sgf-tools.js"></script>
+	<script src="./renderer.js"></script>
 </body>
 </html>

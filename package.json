@@ -1,10 +1,10 @@
 {
-  "name": "kifudepot-translate",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Electron helper for translating KifuDepot SGF metadata.",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  }
+	"name": "kifudepot-translate",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Electron helper for translating KifuDepot SGF metadata.",
+	"main": "main.js",
+	"scripts": {
+		"start": "electron ."
+	}
 }
