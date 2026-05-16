@@ -129,12 +129,11 @@ async function translate() {
 async function saveOutput() {
 	try {
 		const result = await window.kifudepot.saveSgf({
-			sgf: elements.sgfInput.value,
-			fields: collectFields()
+			output: elements.outputPreview.value
 		});
 
 		if (!result.canceled) {
-			setStatus(`Saved ${result.filePath}`, "ok");
+			setStatus(`Saved ${result.fileName || "SGF"}`, "ok");
 		}
 	} catch (error) {
 		setStatus(error.message, "error");

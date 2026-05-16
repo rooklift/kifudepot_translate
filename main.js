@@ -171,9 +171,12 @@ async function translateSgf(_event, payload) {
 }
 
 async function saveSgf(_event, payload) {
-	const sgf = String(payload?.sgf || "");
-	const fields = payload?.fields || {};
-	const output = SgfTools.applyMetadata(sgf, fields, { removeKeys: ["GN"] });
+	const output = String(payload?.output || "");
+
+	if (!output.trim()) {
+		throw new Error("No SGF output to save.");
+	}
+
 	const defaultPath = SgfTools.buildFilename(output);
 
 	const result = await dialog.showSaveDialog({
@@ -190,7 +193,11 @@ async function saveSgf(_event, payload) {
 	}
 
 	fs.writeFileSync(result.filePath, output, "utf8");
-	return { canceled: false, filePath: result.filePath };
+	return {
+		canceled: false,
+		filePath: result.filePath,
+		fileName: path.basename(result.filePath)
+	};
 }
 
 app.whenReady().then(() => {

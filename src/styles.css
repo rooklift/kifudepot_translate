@@ -244,6 +244,7 @@ h3 {
 }
 
 .status {
+	min-width: 0;
 	max-width: 55%;
 	overflow: hidden;
 	color: var(--muted);
