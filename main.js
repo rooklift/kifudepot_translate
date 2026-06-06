@@ -21,7 +21,7 @@ Note that we require exactly the following keys:
 	"WR": "rank of white",
 	"EV": "event",
 	"RO": "round",
-	"C": "any comments / notes from you Claude"
+	"C": "any comments / notes from you Claude about translation issues only"
 }
 
 Specify ranks using a "p", e.g. "9p", unless it's clearly an amateur.
@@ -90,7 +90,7 @@ function getKeySource() {
 function getKeyPaths() {
 	return [
 		path.join(__dirname, "keys", "anthropic.txt"),
-		path.resolve(__dirname, "..", "claude_api_sandbox", "keys", "anthropic.txt")
+		// Could add other locations to try
 	];
 }
 
