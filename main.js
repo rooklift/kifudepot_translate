@@ -115,6 +115,24 @@ function extractJson(text) {
 	return JSON.parse(jsonText);
 }
 
+function describeAnthropicError(responseText) {
+	try {
+		const data = JSON.parse(responseText);
+		const message = data?.error?.message || data?.message;
+		const type = data?.error?.type || data?.type;
+		if (message && type) {
+			return `${type}: ${message}`;
+		}
+		if (message) {
+			return message;
+		}
+	} catch {
+		// Fall back to the raw response excerpt below.
+	}
+
+	return responseText.slice(0, 800);
+}
+
 async function translateSgf(_event, payload) {
 	const sgf = String(payload?.sgf || "");
 	const apiKey = resolveApiKey(payload?.apiKey);
@@ -131,43 +149,69 @@ async function translateSgf(_event, payload) {
 	}
 
 	const { message, props } = buildClaudeMessage(sgf);
-	const response = await fetch(ANTHROPIC_URL, {
-		method: "POST",
-		headers: {
-			"x-api-key": apiKey,
-			"anthropic-version": ANTHROPIC_VERSION,
-			"content-type": "application/json"
-		},
-		body: JSON.stringify({
-			model,
-			max_tokens: 1000,
-			temperature: 0,
-			system: SYS_PROMPT.trim(),
-			messages: [
-				{ role: "user", content: message }
-			]
-		})
-	});
+	console.info(`Translating SGF metadata with ${model}`);
 
-	const responseText = await response.text();
-	if (!response.ok) {
-		throw new Error(`Anthropic request failed (${response.status}): ${responseText.slice(0, 800)}`);
+	try {
+		const response = await fetch(ANTHROPIC_URL, {
+			method: "POST",
+			headers: {
+				"x-api-key": apiKey,
+				"anthropic-version": ANTHROPIC_VERSION,
+				"content-type": "application/json"
+			},
+			body: JSON.stringify({
+				model,
+				max_tokens: 1000,
+				// Opus 4.7+ rejects non-default sampling params; keep formatting deterministic via the prompt.
+				system: SYS_PROMPT.trim(),
+				messages: [
+					{ role: "user", content: message }
+				]
+			})
+		});
+
+		const responseText = await response.text();
+		if (!response.ok) {
+			throw new Error(`Anthropic request failed (${response.status}) for ${model}: ${describeAnthropicError(responseText)}`);
+		}
+
+		let data;
+		try {
+			data = JSON.parse(responseText);
+		} catch (error) {
+			throw new Error(`Anthropic returned invalid JSON for ${model}: ${error.message}. Body: ${responseText.slice(0, 800)}`);
+		}
+
+		const text = Array.isArray(data.content)
+			? data.content.filter((block) => block.type === "text").map((block) => block.text).join("\n")
+			: "";
+
+		if (data.stop_reason === "refusal") {
+			const category = data.stop_details?.category ? ` (${data.stop_details.category})` : "";
+			throw new Error(`Claude refused the request${category}. ${text.trim() || "No refusal text was returned."}`);
+		}
+
+		if (!text.trim()) {
+			throw new Error(`Claude returned no text content for ${model}. stop_reason=${data.stop_reason || "unknown"}`);
+		}
+
+		let parsed;
+		try {
+			parsed = extractJson(text);
+		} catch (error) {
+			throw new Error(`Claude returned text that could not be parsed as JSON for ${model}: ${error.message}. Text: ${text.slice(0, 800)}`);
+		}
+
+		console.info(`Translation complete with ${model}`);
+		return {
+			parsed,
+			rawText: text,
+			sourceProps: props
+		};
+	} catch (error) {
+		console.error(`Translation failed with ${model}:`, error);
+		throw error;
 	}
-
-	const data = JSON.parse(responseText);
-	const text = Array.isArray(data.content)
-		? data.content.filter((block) => block.type === "text").map((block) => block.text).join("\n")
-		: "";
-
-	if (!text.trim()) {
-		throw new Error("Claude returned no text content.");
-	}
-
-	return {
-		parsed: extractJson(text),
-		rawText: text,
-		sourceProps: props
-	};
 }
 
 async function saveSgf(_event, payload) {

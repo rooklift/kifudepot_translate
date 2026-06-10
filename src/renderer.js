@@ -120,6 +120,7 @@ async function translate() {
 		updatePreview();
 		setStatus("Translation complete", "ok");
 	} catch (error) {
+		console.error("Translation failed:", error);
 		setStatus(error.message, "error");
 	} finally {
 		elements.translate.disabled = false;
@@ -136,6 +137,7 @@ async function saveOutput() {
 			setStatus(`Saved ${result.fileName || "SGF"}`, "ok");
 		}
 	} catch (error) {
+		console.error("Save failed:", error);
 		setStatus(error.message, "error");
 	}
 }
@@ -168,6 +170,9 @@ for (const field of fields) {
 	field.addEventListener("input", updatePreview);
 }
 
-loadDefaults().catch((error) => setStatus(error.message, "error"));
+loadDefaults().catch((error) => {
+	console.error("Loading defaults failed:", error);
+	setStatus(error.message, "error");
+});
 renderSourceProps();
 updatePreview();
