@@ -187,6 +187,11 @@ h3 {
 	border-bottom: 1px solid var(--line);
 }
 
+.pane-heading h2,
+.output-actions > div {
+	min-width: 0;
+}
+
 .button-row {
 	display: flex;
 	gap: 8px;
@@ -246,6 +251,7 @@ h3 {
 .status {
 	min-width: 0;
 	max-width: 55%;
+	flex: 0 1 auto;
 	overflow: hidden;
 	color: var(--muted);
 	text-align: right;

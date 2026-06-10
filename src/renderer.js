@@ -21,7 +21,15 @@ const elements = {
 
 function setStatus(message, kind) {
 	elements.status.textContent = message;
+	elements.status.title = message;
 	elements.status.dataset.kind = kind || "";
+}
+
+function setErrorStatus(action, error) {
+	const message = error?.message || String(error);
+	console.error(`${action} failed:`, error);
+	setStatus(`${action} failed. See console for details.`, "error");
+	elements.status.title = message;
 }
 
 function collectFields() {
@@ -120,8 +128,7 @@ async function translate() {
 		updatePreview();
 		setStatus("Translation complete", "ok");
 	} catch (error) {
-		console.error("Translation failed:", error);
-		setStatus(error.message, "error");
+		setErrorStatus("Translation", error);
 	} finally {
 		elements.translate.disabled = false;
 	}
@@ -137,8 +144,7 @@ async function saveOutput() {
 			setStatus(`Saved ${result.fileName || "SGF"}`, "ok");
 		}
 	} catch (error) {
-		console.error("Save failed:", error);
-		setStatus(error.message, "error");
+		setErrorStatus("Save", error);
 	}
 }
 
@@ -171,8 +177,7 @@ for (const field of fields) {
 }
 
 loadDefaults().catch((error) => {
-	console.error("Loading defaults failed:", error);
-	setStatus(error.message, "error");
+	setErrorStatus("Loading defaults", error);
 });
 renderSourceProps();
 updatePreview();
