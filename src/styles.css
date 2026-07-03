@@ -174,7 +174,9 @@ h3 {
 }
 
 .metadata-pane {
-	grid-template-rows: auto auto 96px auto minmax(180px, 1fr);
+	grid-template-rows: auto auto 96px auto;
+	align-self: start;
+	align-content: start;
 }
 
 .pane-heading,
@@ -185,6 +187,11 @@ h3 {
 	gap: 12px;
 	padding: 14px;
 	border-bottom: 1px solid var(--line);
+}
+
+.output-actions {
+	border-bottom: 0;
+	border-radius: 0 0 8px 8px;
 }
 
 .pane-heading h2,
@@ -303,12 +310,6 @@ h3 {
 	white-space: nowrap;
 }
 
-.output-preview {
-	height: 100%;
-	border: 0;
-	border-radius: 0 0 8px 8px;
-}
-
 @media (max-width: 980px) {
 	body {
 		min-width: 0;
@@ -342,6 +343,6 @@ h3 {
 	}
 
 	.metadata-pane {
-		height: 760px;
+		height: auto;
 	}
 }

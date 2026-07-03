@@ -11,7 +11,6 @@ const elements = {
 	keySource: document.querySelector("#key-source"),
 	model: document.querySelector("#model"),
 	notes: document.querySelector("#notes"),
-	outputPreview: document.querySelector("#output-preview"),
 	saveOutput: document.querySelector("#save-output"),
 	sgfInput: document.querySelector("#sgf-input"),
 	sourceProps: document.querySelector("#source-props"),
@@ -19,10 +18,13 @@ const elements = {
 	translate: document.querySelector("#translate")
 };
 
+let currentOutput = "";
+
 function setStatus(message, kind) {
 	elements.status.textContent = message;
 	elements.status.title = message;
 	elements.status.dataset.kind = kind || "";
+	delete elements.status.dataset.source;
 }
 
 function setErrorStatus(action, error) {
@@ -77,29 +79,35 @@ function renderSourceProps() {
 	}
 }
 
-function updatePreview() {
+function updateOutput() {
 	const sgf = elements.sgfInput.value;
 	if (!sgf.trim()) {
-		elements.outputPreview.value = "";
+		currentOutput = "";
 		elements.filename.textContent = "kifu.sgf";
+		if (elements.status.dataset.source === "sgf") {
+			setStatus("Ready", "");
+		}
 		return;
 	}
 
 	try {
-		const output = SgfTools.applyMetadata(sgf, collectFields(), { removeKeys: ["GN"] });
-		elements.outputPreview.value = output;
-		elements.filename.textContent = SgfTools.buildFilename(output);
+		currentOutput = SgfTools.applyMetadata(sgf, collectFields(), { removeKeys: ["GN"] });
+		elements.filename.textContent = SgfTools.buildFilename(currentOutput);
+		if (elements.status.dataset.source === "sgf") {
+			setStatus("Ready", "");
+		}
 	} catch (error) {
-		elements.outputPreview.value = "";
+		currentOutput = "";
 		elements.filename.textContent = "kifu.sgf";
 		setStatus(error.message, "error");
+		elements.status.dataset.source = "sgf";
 	}
 }
 
 function resetFields() {
 	setFields({});
 	elements.notes.value = "";
-	updatePreview();
+	updateOutput();
 }
 
 async function loadDefaults() {
@@ -125,7 +133,7 @@ async function translate() {
 		setFields(parsed);
 		elements.notes.value = parsed.C || "";
 		renderSourceProps();
-		updatePreview();
+		updateOutput();
 		setStatus("Translation complete", "ok");
 	} catch (error) {
 		setErrorStatus("Translation", error);
@@ -137,7 +145,7 @@ async function translate() {
 async function saveOutput() {
 	try {
 		const result = await window.kifudepot.saveSgf({
-			output: elements.outputPreview.value
+			output: currentOutput
 		});
 
 		if (!result.canceled) {
@@ -149,11 +157,11 @@ async function saveOutput() {
 }
 
 async function copyOutput() {
-	if (!elements.outputPreview.value) {
+	if (!currentOutput) {
 		return;
 	}
 
-	await navigator.clipboard.writeText(elements.outputPreview.value);
+	await navigator.clipboard.writeText(currentOutput);
 	setStatus("Output copied", "ok");
 }
 
@@ -173,11 +181,11 @@ elements.sgfInput.addEventListener("input", () => {
 });
 
 for (const field of fields) {
-	field.addEventListener("input", updatePreview);
+	field.addEventListener("input", updateOutput);
 }
 
 loadDefaults().catch((error) => {
 	setErrorStatus("Loading defaults", error);
 });
 renderSourceProps();
-updatePreview();
+updateOutput();
